@@ -6,18 +6,21 @@ interface ModuleTileProps {
   className?: string;
   gridSize?: number;
   defPos?: {x: number, y: number};
-  defSize?: {width: number, height: number};
+  defSize?: {width?: number, height?: number};
+  minSize?: {width?: number, height?: number};
+  onResize: (width: number, height: number) => void;
 }
 
 const DEFAULT_GRID = 100;
 
 const style = {
   display: "flex",
+  flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
   border: "solid 1px #DDDDDD",
   background: "#F0F0F0"
-}
+} as React.CSSProperties
 
 const ModuleTile: React.FC<ModuleTileProps> = (props) => {
   const [x, setPosX] = useState<number>(props.defPos?.x || 0);
@@ -34,11 +37,16 @@ const ModuleTile: React.FC<ModuleTileProps> = (props) => {
         setPosX(Math.round(drag.x/(props.gridSize || DEFAULT_GRID))*(props.gridSize || DEFAULT_GRID));
         setPosY(Math.round(drag.y/(props.gridSize || DEFAULT_GRID))*(props.gridSize || DEFAULT_GRID));
       }}
+      minWidth={props.minSize?.width || 0}
+      minHeight={props.minSize?.height || 0}
       onResizeStop={(_e, _direction, ref, _delta, position) => {
-        if (!isNaN(parseInt(ref.style.width))) setWidth(parseInt(ref.style.width));
-        if (!isNaN(parseInt(ref.style.height))) setHeight(parseInt(ref.style.height));
         setPosX(position.x);
         setPosY(position.y);
+        if (!isNaN(parseInt(ref.style.width)) && !isNaN(parseInt(ref.style.height))) {
+          setWidth(parseInt(ref.style.width));
+          setHeight(parseInt(ref.style.height));
+          props.onResize(parseInt(ref.style.width), parseInt(ref.style.height));
+        }
       }}
       resizeGrid={[props.gridSize || DEFAULT_GRID, props.gridSize || DEFAULT_GRID]}
       dragGrid={[props.gridSize || DEFAULT_GRID, props.gridSize || DEFAULT_GRID]}
