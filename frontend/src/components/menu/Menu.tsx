@@ -3,12 +3,14 @@ import styled from 'styled-components';
 import Container from '@material-ui/core/Container';
 import socket from 'util/Socket';
 import { Session } from 'types/session';
-import JoinForm from './JoinForm';
-import Lobby from './Lobby';
+import JoinSessionCodeForm from './JoinSessionCodeForm';
+import Lobby from './SessionLobby';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(() => ({
-
+  container: {
+    height: "100vh",
+  }
 }))
 
 interface MenuProps {
@@ -17,6 +19,8 @@ interface MenuProps {
 }
 
 const Menu: React.FC<MenuProps> = (props) => {
+  const classes = useStyles();
+
   const [sessionData, setSessionData] = useState<Session | null>(null);
   const [username, setUsername] = useState<string>("");
 
@@ -31,20 +35,20 @@ const Menu: React.FC<MenuProps> = (props) => {
   
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" className={classes.container}>
       {/* If there is no session code in session storage, display the join form */}
-      { !sessionStorage.getItem('session_code') && !sessionData && 
-        <JoinForm userType={props.userType} />
-      }
+      {/* { !sessionStorage.getItem('session_code') && !sessionData &&  */}
+        {/* <JoinSessionCodeForm userType={props.userType} /> */}
+      {/* } */}
 
       {/* If there is a session code in storage, display the lobby */}
-      { sessionStorage.getItem('session_code') && sessionData &&
-        <Lobby
+      {/* { sessionStorage.getItem('session_code') && sessionData && */}
+        {/* <Lobby
           userType={props.userType}
           sessionData={sessionData}
           username={username}
-        />
-      }
+        /> */}
+      {/* } */}
     </Container>
   )
 }

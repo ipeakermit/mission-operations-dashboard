@@ -1,21 +1,37 @@
 import React, {useState} from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Menu from 'components/menu/Menu';
+import { CssBaseline, ThemeProvider } from '@material-ui/core';
+import { themes } from 'util/themes';
+import JoinSessionCodeForm from 'components/menu/JoinSessionCodeForm';
+import SessionLobby from 'components/menu/SessionLobby';
 
 function App() {
+  const [theme, setTheme] = useState(themes.dark);
+
+  const toggleTheme = () => {
+    setTheme(theme => theme === themes.dark ? themes.light : themes.dark)
+  }
+
   return (
-    <div className="App">
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Router>
         <Switch>
+          <Route path="/tutor/:sessioncode">
+            <SessionLobby userType="tutor" />
+          </Route>
           <Route path="/tutor">
-            <Menu userType="tutor" />
+            <JoinSessionCodeForm userType="tutor" />
+          </Route>
+          <Route path="/:sessioncode">
+            <SessionLobby userType="student" />
           </Route>
           <Route path="/">
-            <Menu userType="student" />
+            <JoinSessionCodeForm userType="student" />
           </Route>
         </Switch>
       </Router>
-    </div>
+    </ThemeProvider>
   );
 }
 

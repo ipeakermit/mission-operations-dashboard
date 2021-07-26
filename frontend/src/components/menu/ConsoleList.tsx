@@ -11,7 +11,7 @@ const useStyles = makeStyles(() => ({
     minHeight: "24px",
   },
   header: {
-    backgroundColor: "#C5C7C9",
+    //TODO: Move this to theme -> backgroundColor: "#C5C7C9",
     textAlign: "center"
   }
 }))
@@ -28,7 +28,7 @@ const ConsoleList: React.FC<ConsoleListProps> = (props) => {
 
   return (
     <Paper variant="outlined">
-      <List aria-label={`${props.console} list`} disablePadding>
+      <List aria-label={`${props.console} list`} disablePadding dense>
         <ListItem 
           className={classes.header} 
           button 
@@ -43,8 +43,11 @@ const ConsoleList: React.FC<ConsoleListProps> = (props) => {
         <ListItem divider>
           <ListItemText className={classes.listitem}>{props.users[0]}</ListItemText>
         </ListItem>
-        <ListItem>
+        <ListItem divider>
           <ListItemText className={classes.listitem}>{props.users[1]}</ListItemText>
+        </ListItem>
+        <ListItem>
+          <ListItemText className={classes.listitem}>{props.users[2]}</ListItemText>
         </ListItem>
       </List>
     </Paper>

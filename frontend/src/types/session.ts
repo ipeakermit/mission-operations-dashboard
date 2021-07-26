@@ -6,6 +6,7 @@ export type Session = {
   host_id: string | User;
   session_code: string;
   tutors: string[] | User[];
+  operators: User[];
   consoles: Consoles;
   in_progress: boolean;
   start_time: string;

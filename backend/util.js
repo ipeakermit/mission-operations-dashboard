@@ -10,6 +10,7 @@ const fetchSession = async (session_code) => {
   .populate({ path: 'consoles', populate: { path: 'capcom', model: 'User' }})
   .populate({ path: 'consoles', populate: { path: 'bme', model: 'User' }})
   .populate({ path: 'tutors', model: 'User' })
+  .populate({ path: 'operators', model: 'User' })
   .catch((e) => {console.log(e)});
 }
 

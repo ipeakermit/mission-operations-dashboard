@@ -5,6 +5,7 @@ const sessionSchema = Schema({
   session_code: { type: String, required: true, index: true},
   host_id: { type: Schema.ObjectId, ref: 'users'},
   tutors: [{ type: Schema.ObjectId, ref: 'users'}],
+  operators: [{type: Schema.ObjectId, ref: 'users'}],
   consoles: {
     spartan: [{ type: Schema.ObjectId, ref: 'users'}],
     cronus: [{ type: Schema.ObjectId, ref: 'users'}],

@@ -1,8 +1,9 @@
 import { Session } from "./session"
 
 export type User = {
-  socket_id: string,
+  _id: string,
   name: string,
   room: string | Session,
-  console: string
+  console: string,
+  disconnected: boolean,
 }
