@@ -4,6 +4,11 @@ import { CssBaseline, ThemeProvider } from '@material-ui/core';
 import { themes } from 'util/themes';
 import JoinSessionCodeForm from 'components/menu/JoinSessionCodeForm';
 import SessionLobby from 'components/menu/SessionLobby';
+import OSTPV from "./components/OSTPV/OSTPV";
+import NavDrawer from "./components/mission_control_tiles/NavDrawer";
+import ConsoleTabPanels from "./components/mission_control_tiles/ConsoleTabPanels";
+import SessionInterface from "./components/mission_control_tiles/SessionInterface";
+import {SessionProvider} from "./context/SessionContext";
 
 function App() {
   const [theme, setTheme] = useState(themes.dark);
@@ -14,23 +19,26 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Switch>
-          <Route path="/tutor/:sessioncode">
-            <SessionLobby userType="tutor" />
-          </Route>
-          <Route path="/tutor">
-            <JoinSessionCodeForm userType="tutor" />
-          </Route>
-          <Route path="/:sessioncode">
-            <SessionLobby userType="student" />
-          </Route>
-          <Route path="/">
-            <JoinSessionCodeForm userType="student" />
-          </Route>
-        </Switch>
-      </Router>
+      <SessionProvider>
+        <CssBaseline />
+        <Router>
+          <Switch>
+            <Route path="/tutor/:sessioncode">
+              <SessionLobby userType="tutor" />
+            </Route>
+            <Route path="/tutor">
+              <JoinSessionCodeForm userType="tutor" />
+            </Route>
+            <Route path="/:sessioncode">
+              <SessionLobby userType="student" />
+            </Route>
+            <Route path="/">
+              <JoinSessionCodeForm userType="student" />
+              {/*<SessionInterface />*/}
+            </Route>
+          </Switch>
+        </Router>
+      </SessionProvider>
     </ThemeProvider>
   );
 }

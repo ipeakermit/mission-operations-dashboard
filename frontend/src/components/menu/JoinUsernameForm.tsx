@@ -13,6 +13,7 @@ import { Formik, Form, Field} from 'formik';
 import { TextField } from 'formik-material-ui';
 import socket from 'util/Socket';
 import { useLocalStorageMap } from 'util/useLocalStorageMap';
+import {useSessionContext} from "../../context/SessionContext";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -63,6 +64,7 @@ const JoinUsernameForm: React.FC<JoinUsernameFormProps> = (props) => {
   const classes = useStyles();
   const history = useHistory();
   const [ reconnectMap, addMapKey, deleteMapKey] = useLocalStorageMap("reconnectMap", new Map());
+  const { session, setSession, userID, setUserID } = useSessionContext();
   const [error, setError] = useState<string>("");
 
   const handleJoinSession = ( values: JoinUsernameFormValues ) => {
@@ -73,6 +75,7 @@ const JoinUsernameForm: React.FC<JoinUsernameFormProps> = (props) => {
         else {
           setError("")
           addMapKey(props.sessionCode, res.data.userID)
+          setUserID(res.data.userID);
         };
       })
     } else if (props.userType === "tutor") {
@@ -81,6 +84,7 @@ const JoinUsernameForm: React.FC<JoinUsernameFormProps> = (props) => {
         else {
           setError("")
           addMapKey(props.sessionCode, res.data.userID)
+          setUserID(res.data.userID);
         };
       })
     }

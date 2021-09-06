@@ -11,6 +11,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Formik, Form, Field} from 'formik';
 import { TextField } from 'formik-material-ui';
 import socket from 'util/Socket';
+import {useLocalStorageMap} from "../../util/useLocalStorageMap";
+import {useSessionContext} from "../../context/SessionContext";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -59,6 +61,8 @@ interface JoinSessionCodeFormProps {
 const JoinSessionCodeForm: React.FC<JoinSessionCodeFormProps> = (props) => {  
   const classes = useStyles();
   const history = useHistory();
+  const [ reconnectMap, addMapKey, deleteMapKey] = useLocalStorageMap("reconnectMap", new Map());
+  const { session, setSession, userID, setUserID } = useSessionContext();
 
   const [error, setError] = useState<string>("");
 
@@ -84,6 +88,8 @@ const JoinSessionCodeForm: React.FC<JoinSessionCodeFormProps> = (props) => {
         // Redirect user to the lobby of newly created session
         console.log(res.data.sessionCode);
         setError("");
+        addMapKey(res.data.sessionCode, res.data.userID)
+        setUserID(res.data.userID);
         history.push(`/tutor/${res.data.sessionCode}`)
       }
     })

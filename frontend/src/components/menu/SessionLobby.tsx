@@ -1,11 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import socket from 'util/Socket';
 import { Session } from 'types/session';
+import { useSessionContext } from "../../context/SessionContext";
 import { useHistory, useParams } from 'react-router'
 import { makeStyles } from '@material-ui/core/styles';
 import { useLocalStorageMap } from 'util/useLocalStorageMap';
 import JoinUsernameForm from './JoinUsernameForm';
 import JoinConsoleScreen from './JoinConsoleScreen';
+import SessionInterface from "../mission_control_tiles/SessionInterface";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -25,22 +27,32 @@ const SessionLobby: React.FC<SessionLobbyProps> = (props) => {
   const classes = useStyles();
   const history = useHistory();
   const { sessioncode } = useParams<SessionLobbyParams>();
+  const { session, setSession, userID, setUserID } = useSessionContext();
   const [ reconnectMap, addMapKey, deleteMapKey] = useLocalStorageMap("reconnectMap", new Map());
-  const [sessionData, setSessionData] = useState<Session | null>(null);
 
   const clearSessionData = () => {
-    setSessionData(null);
+    setSession(null);
+    setUserID(null);
   }
 
   // Handle receiving session data update events
   useEffect(() => {
-    console.log(socket.id);
-    socket.off("SESSION_DATA").on("SESSION_DATA", setSessionData)
+    socket.off("SESSION_DATA").on("SESSION_DATA", (sessionData: Session) => {
+      setSession(sessionData);
+    })
     socket.io.off("reconnect").on("reconnect", (attempt: number) => {
       if (reconnectMap.has(sessioncode)) {
-        socket.emit("RECONNECT_USER", reconnectMap.get(sessioncode), sessioncode, (res: { success: boolean, msg: string }) => {
-          console.log(res.success, res.msg)
-        });
+        if (props.userType === "tutor") {
+          socket.emit("RECONNECT_TUTOR", reconnectMap.get(sessioncode), sessioncode, (res: { success: boolean, msg: string }) => {
+            console.log(res.success, res.msg)
+            setUserID(reconnectMap.get(sessioncode));
+          });
+        } else {
+          socket.emit("RECONNECT_USER", reconnectMap.get(sessioncode), sessioncode, (res: { success: boolean, msg: string }) => {
+            console.log(res.success, res.msg)
+            setUserID(reconnectMap.get(sessioncode));
+          });
+        }
       }
     })
   }, [reconnectMap, sessioncode])
@@ -60,9 +72,15 @@ const SessionLobby: React.FC<SessionLobbyProps> = (props) => {
         // If the session is found, check if the user already has a socket id for it in localstorage
         if (reconnectMap.has(sessioncode)) {
           let userID = reconnectMap.get(sessioncode);
-          socket.emit("RECONNECT_USER", userID, sessioncode, (res: { success: boolean, msg: string }) => {
-            console.log(res.success, res.msg)
-          });
+          if (props.userType === "tutor") {
+            socket.emit("RECONNECT_TUTOR", userID, sessioncode, (res: { success: boolean, msg: string }) => {
+              console.log(res.success, res.msg)
+            });
+          } else {
+            socket.emit("RECONNECT_USER", userID, sessioncode, (res: { success: boolean, msg: string }) => {
+              console.log(res.success, res.msg)
+            });
+          }
         } else {
           console.log("No reconnect")
         }
@@ -72,15 +90,18 @@ const SessionLobby: React.FC<SessionLobbyProps> = (props) => {
   
   return (  
     <React.Fragment>
-      { !sessionData &&
+      { !session &&
         <JoinUsernameForm sessionCode={sessioncode} userType={props.userType} />
       }
       {
-        sessionData &&
-        <JoinConsoleScreen userType={props.userType} sessionData={sessionData} clearSession={clearSessionData}/>
+        session && !session.in_progress &&
+        <JoinConsoleScreen userType={props.userType} clearSession={clearSessionData}/>
+      }
+      {
+        session && session.in_progress &&
+        <SessionInterface userType={props.userType}/>
       }
     </React.Fragment>
   )
 }
-
 export default SessionLobby;

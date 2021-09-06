@@ -26,7 +26,6 @@ const Menu: React.FC<MenuProps> = (props) => {
 
   useEffect(() => {
     socket.off("SESSION_DATA").on("SESSION_DATA", (data: Session) => {
-      console.log("Session data updated", data);
       sessionStorage.setItem('socket_id', socket.id);
       sessionStorage.setItem('session_code', data.session_code);
       setSessionData(data);
