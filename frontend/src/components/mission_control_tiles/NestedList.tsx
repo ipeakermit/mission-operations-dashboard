@@ -60,6 +60,13 @@ const NestedList: React.FC<NestedListProps> = (props) => {
             }
             <ListItem
                 button
+                onClick={() => props.setActive("HOME")}
+                selected={props.active === "HOME"}
+            >
+                <ListItemText primary={"HOME"}/>
+            </ListItem>
+            <ListItem
+                button
                 selected={props.active.includes("SPARTAN")}
                 onClick={() => handleOpen("SPARTAN")}
             >
@@ -118,7 +125,7 @@ const NestedList: React.FC<NestedListProps> = (props) => {
                         className={classes.nested}
                         selected={props.active === "CRONUS-3"}
                     >
-                        <ListItemText primary={"Video Comms 1"}/>
+                        <ListItemText primary={"Video Comms"}/>
                     </ListItem>
                 </List>
             </Collapse>

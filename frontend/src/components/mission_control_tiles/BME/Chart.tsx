@@ -23,7 +23,7 @@ const Chart: React.FC<ChartProps> = (props) => {
                     initialPoint
                 ],
                 backgroundColor: "white",
-                borderColor: "red",
+                borderColor: "green",
                 borderWidth: 2,
                 fill: false
             }
@@ -43,7 +43,7 @@ const Chart: React.FC<ChartProps> = (props) => {
                 {
                     data: [initialPoint, ...data],
                     backgroundColor: "white",
-                    borderColor: "red",
+                    borderColor: "lime",
                     borderWidth: 2,
                     fill: false
                 }

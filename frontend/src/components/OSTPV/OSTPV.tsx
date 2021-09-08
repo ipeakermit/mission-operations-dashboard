@@ -9,6 +9,8 @@ import {CalEvent, DBEvent, Event} from '../../types/event'
 import OSTPVModal from "./OSTPVModal";
 import socket from "../../util/Socket";
 import {DateTime} from "luxon";
+import Typography from "@material-ui/core/Typography";
+import OSTPVClock from "./OSTPVClock";
 
 const useStyles = makeStyles(() => ({
     container: {
@@ -140,6 +142,7 @@ const OSTPV: React.FC<OSTPVProps> = (props) => {
     return (
         <Container className={classes.container}>
             <Paper variant={"outlined"} className={classes.paper}>
+                <OSTPVClock />
                 <FullCalendar
                     eventClassNames={classes.event}
                     eventMinWidth={0}
@@ -147,8 +150,8 @@ const OSTPV: React.FC<OSTPVProps> = (props) => {
                     events={events}
                     expandRows={true}
                     eventClick={handleEventClick}
-                    headerToolbar={{start: '', center: '', end: '',}}
-                    height={700}
+                    headerToolbar={false}
+                    height={668}
                     initialView='resourceTimeline'
                     navLinks={false}
                     now={nowTime}
