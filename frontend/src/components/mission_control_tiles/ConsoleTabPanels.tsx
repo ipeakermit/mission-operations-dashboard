@@ -20,10 +20,11 @@ import ETHOSThermalSystem from "./ETHOS/ETHOSThermalSystem";
 import ETHOSRegenLifeSupport from "./ETHOS/ETHOSRegenLifeSupport";
 import CAPCOM from "./CAPCOM/CAPCOM";
 import Tutor from "./TUTOR/Tutor";
+import Home from "./Home";
 
 const useStyles = makeStyles({
     tabs: {
-        marginTop: "30px",
+        marginTop: "20px",
         marginLeft: "250px",
         minWidth: "800px"
     }
@@ -39,6 +40,9 @@ const ConsoleTabPanels: React.FC<ConsoleTabPanelsProps> = (props) => {
         <React.Fragment>
             <ContentPane hidden={props.active !== "TUTOR"} className={classes.tabs}>
                 <Tutor />
+            </ContentPane>
+            <ContentPane hidden={props.active !== "HOME"} className={classes.tabs}>
+                <Home />
             </ContentPane>
             <ContentPane hidden={props.active !== "SPARTAN-1"} className={classes.tabs}>
                 <SPARTANPowerConsole />

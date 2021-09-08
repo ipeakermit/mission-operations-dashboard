@@ -22,7 +22,7 @@ const SessionInterface: React.FC<SessionInterfaceProps> = (props) => {
     const classes = useStyles();
     const [ reconnectMap, addMapKey, deleteMapKey] = useLocalStorageMap("reconnectMap", new Map());
     const {session} = useSessionContext();
-    const [activeTab, setActiveTab] = useState("SPARTAN-1");
+    const [activeTab, setActiveTab] = useState("HOME");
     const [efnModalOpen, setEfnModalOpen] = useState<boolean>(false)
     const [visitedTabs, setVisitedTabs] = useState<string[]>([]);
 
