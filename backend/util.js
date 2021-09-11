@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const Session = require('./session');
-const Log = require("./log");
+const Session = require('./schemas/session');
+const Log = require("./schemas/log");
 const {DateTime} = require("luxon");
 
 const fetchSession = async (session_code) => {

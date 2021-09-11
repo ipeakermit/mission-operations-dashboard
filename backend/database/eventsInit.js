@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Event = require('./event')
+const Event = require('../schemas/event')
 
 const astroEvents = [
   {
@@ -2830,21 +2830,17 @@ const headerEvents = [
   },
 ];
 
-const initEvents = async (session_id) => {
+const initEvents = async (session_id, db_session) => {
+  // Insert header events
   await Event.insertMany(
     headerEvents.map((event) => ({...event, session_id: session_id})),
-    (err, docs) => {
-    if (err) {
-      console.log(err);
-    }
-  })
+    { session: db_session}
+  )
+  // Insert astronaut events
   await Event.insertMany(
     astroEvents.map((event) => ({...event, session_id: session_id})),
-    (err, docs) => {
-    if (err) {
-      console.log(err);
-    }
-  })
+    { session: db_session}
+  )
 }
 
 module.exports.initEvents = initEvents;
