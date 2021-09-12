@@ -67,6 +67,7 @@ const handler = async (context) => {
 
     // Return session data and callback response
     console.info(`CREATE_SESSION: Session ${newSessionCode} created`);
+    context.io.in(newSessionCode).emit("SESSION_DATA", session);
     return [session, {
       success: true, msg: "", data: {
         sessionCode: newSessionCode,

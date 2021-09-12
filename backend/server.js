@@ -31,144 +31,39 @@ io.on('connection', socket => {
   const context = {socket: socket, io: io};
   console.info(`Client connected with socketID ${socket.id}`);
 
-  socket.on("JOIN_SESSION", async (session_code, username, cb) => {
-    let [session, response] = await require('./event_handlers/menu/joinSession.js')
-      .handler(context, session_code, username)
-    cb(response);
-    io.in(session_code).emit("SESSION_DATA", session);
-  })
-
+  // Handle host creating new session
   socket.on("CREATE_SESSION", async (cb) => {
-    let [session, response] = await require('./event_handlers/menu/createSession.js')
+    let response = await require('./event_handlers/menu/createSession.js')
       .handler(context);
     cb(response);
-    io.in(session.session_code).emit("SESSION_DATA", session);
   })
 
+  // Handle user checking if session exists
   socket.on("CHECK_SESSION_CODE", async (session_code, cb) => {
     let response = await require('./event_handlers/menu/checkSessionCode.js')
       .handler(session_code);
     cb(response);
   })
 
-  socket.on("JOIN_CONSOLE", async (console_name, session_code, user_id, cb) => {
-    console.group("JOIN_CONSOLE event")
-    // Check to make sure the console is not full
-    var session = await Session.where({session_code: session_code}).findOne().catch((e) => {
-      console.log(e)
-    });
-    if (!session) {
-      // If no session is returned, return error to the client
-      console.error(`Session ${session_code} could not be found in database`);
-      cb({success: false, msg: "Session could not be found in database"})
-      return;
-    }
-    if (session.consoles[console_name].length >= 3) {
-      // If the console is already full, return error to the client
-      console.error(`Console ${console_name} is already full`);
-      cb({success: false, msg: "Specified console is already full"})
-      return;
-    }
-
-    // If session exists and space is availabe in console, set user's console
-    const user = await User.findByIdAndUpdate(user_id, {console: console_name}, {new: false}).catch((e) => {
-      console.log(e)
-    });
-    if (!user) {
-      // If no user is returned, return error to the client
-      console.error(`User ${user_id} could not be found in database`);
-      cb({success: false, msg: "No user could be found with matching socket_id"});
-      return;
-    }
-    if (user && user.console !== null) {
-      // If a user is returned and they already have a console, update it and remove them from the console array in the
-      // session object
-      console.info(`User ${user_id} was previously assigned to ${user.console} in session ${session_code}`)
-      let updateKey = "consoles." + user.console;
-      await Session.updateOne({_id: session._id}, {
-        $pull: {[updateKey]: user._id},
-      })
-    }
-
-    // Add user id to array in session consoles
-    let updateKey = "consoles." + console_name;
-    session = await Session.findOneAndUpdate({_id: session._id}, {
-                             $addToSet: {[updateKey]: user._id},
-                           }, {new: true, omitUndefined: true})
-                           .populate({path: 'consoles', populate: {path: 'spartan', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'ethos', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'cronus', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'flight', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'capcom', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'bme', model: 'User'}})
-                           .populate({path: 'tutors', model: 'User'})
-                           .populate({path: 'operators', model: 'User'})
-                           .catch((e) => {
-                             console.log(e)
-                           });
-
-    // Return and emit updated session data
-    console.info(`User ${user_id} added to ${console_name} in session ${session_code}`);
-    console.groupEnd();
-    cb({success: true, msg: ""});
-    io.in(session_code).emit("SESSION_DATA", session);
+  // Handle user joining active session
+  socket.on("JOIN_SESSION", async (session_code, username, cb) => {
+    let response = await require('./event_handlers/menu/joinSession.js')
+      .handler(context, session_code, username)
+    cb(response);
   })
 
+  // Handle tutor joining active session
   socket.on("TUTOR_JOIN_SESSION", async (session_code, username, cb) => {
-    console.group("TUTOR_JOIN_SESSION event")
+    let response = await require('./event_handlers/menu/tutorJoinSession.js')
+      .handler(context, session_code, username)
+    cb(response);
+  })
 
-    // Try to fetch session and see if it exists
-    var session = await fetchSession(session_code);
-    if (!session) {
-      // If session is null, the specified session does not exist
-      console.error(`Session ${session_code} does not exist`)
-      cb({success: false, msg: `Session ${session_code} does not exist`});
-      console.groupEnd();
-      return;
-    }
-
-    // Create a new user object in the database
-    const newUser = await User.create({
-      name: username,
-      room: session._id,
-      console: 'tutor',
-      socketid: socket.id,
-    }).catch((e) => {
-      console.log(e)
-    });
-    if (!newUser) {
-      // If the new user is not created, return an error
-      console.error("Error creating user for client")
-      cb({success: false, msg: "Error creating user for client"});
-      console.groupEnd();
-      return;
-    }
-
-    // Add user id to array in session consoles
-    let updateKey = "tutors";
-    session = await Session.findOneAndUpdate({_id: session._id}, {
-                             $addToSet: {[updateKey]: newUser._id},
-                           }, {new: true, omitUndefined: true})
-                           .populate({path: 'consoles', populate: {path: 'spartan', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'ethos', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'cronus', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'flight', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'capcom', model: 'User'}})
-                           .populate({path: 'consoles', populate: {path: 'bme', model: 'User'}})
-                           .populate({path: 'tutors', model: 'User'})
-                           .populate({path: 'operators', model: 'User'})
-                           .catch((e) => {
-                             console.log(e)
-                           });
-
-    // Add the host socket to the newly created room
-    socket.join(session_code);
-
-    // Return and emit updated session data
-    console.info(`Tutor ${newUser._id} added to tutors in session ${session_code}`);
-    console.groupEnd();
-    cb({success: true, msg: "", data: {userID: newUser._id}});
-    io.in(session_code).emit("SESSION_DATA", session);
+  // Handle student assigning themselves to a console
+  socket.on("JOIN_CONSOLE", async (console_name, session_code, user_id, cb) => {
+    let response = await require('./event_handlers/lobby/joinConsole.js')
+      .handler(context, session_code, user_id)
+    cb(response);
   })
 
   socket.on("disconnect", async (reason) => {
