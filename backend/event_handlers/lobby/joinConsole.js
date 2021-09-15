@@ -1,6 +1,6 @@
 const assert = require("assert");
 const mongoose = require("mongoose");
-const {fetchSession, updateSessionById} = require("../../database/sessionFunctions");
+const {fetchSessionAndPopulate, updateSessionById} = require("../../database/sessionFunctions");
 const {ValidationError} = require("../../database/ValidationError");
 const User = require('../../schemas/user');
 const Session = require('../../schemas/session');
@@ -11,17 +11,17 @@ const handler = async (context, console_name, session_code, user_id) => {
 
   try {
     // Use transaction to roll back changes on error
-    db_session.startTransaction();
+    await db_session.startTransaction();
 
     // Fetch session using session code
-    let session = await fetchSession(session_code, db_session);
+    let session = await fetchSessionAndPopulate(session_code, db_session);
 
     // Throw validation error if no result returned
     assert.ok(session, new ValidationError("No session with matching session code found"));
 
     // Throw validation error if console is full
     let console_count = session.consoles[console_name].length;
-    assert.ok(console_count >= 3, new ValidationError("Specified console is already full"))
+    assert.ok(console_count < 3, new ValidationError("Specified console is already full"))
 
     // Set user's console to selected console (fetch user before update to check if they
     // already were assigned to a console or not
@@ -63,7 +63,7 @@ const handler = async (context, console_name, session_code, user_id) => {
   } catch (err) {
     // If an error occurred, rollback and log the warning details
     await db_session.abortTransaction();
-    console.warn(`JOIN_CONSOLE: ${user.name} failed to join ${console_name} in ${session_code}`, err);
+    console.warn(`JOIN_CONSOLE: User ${user_id} failed to join ${console_name} in ${session_code}`, err);
     return {success: false, msg: err.message}
   }
 }

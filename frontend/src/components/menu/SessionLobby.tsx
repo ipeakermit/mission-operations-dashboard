@@ -38,18 +38,21 @@ const SessionLobby: React.FC<SessionLobbyProps> = (props) => {
   // Handle receiving session data update events
   useEffect(() => {
     socket.off("SESSION_DATA").on("SESSION_DATA", (sessionData: Session) => {
+      console.debug(sessionData);
       setSession(sessionData);
     })
     socket.io.off("reconnect").on("reconnect", (attempt: number) => {
       if (reconnectMap.has(sessioncode)) {
         if (props.userType === "tutor") {
           socket.emit("RECONNECT_TUTOR", reconnectMap.get(sessioncode), sessioncode, (res: { success: boolean, msg: string }) => {
-            console.log(res.success, res.msg)
+            console.log("reconnect response:", res.success, res.msg);
+            console.log("reconnect id storage: ", reconnectMap.get(sessioncode));
             setUserID(reconnectMap.get(sessioncode));
           });
         } else {
           socket.emit("RECONNECT_USER", reconnectMap.get(sessioncode), sessioncode, (res: { success: boolean, msg: string }) => {
-            console.log(res.success, res.msg)
+            console.log("reconnect response:", res.success, res.msg);
+            console.log("reconnect id storage: ", reconnectMap.get(sessioncode));
             setUserID(reconnectMap.get(sessioncode));
           });
         }
@@ -74,11 +77,15 @@ const SessionLobby: React.FC<SessionLobbyProps> = (props) => {
           let userID = reconnectMap.get(sessioncode);
           if (props.userType === "tutor") {
             socket.emit("RECONNECT_TUTOR", userID, sessioncode, (res: { success: boolean, msg: string }) => {
-              console.log(res.success, res.msg)
+              console.log("response:", res.success, res.msg)
+              console.log("id storage: ", reconnectMap.get(sessioncode));
+              setUserID(userID);
             });
           } else {
             socket.emit("RECONNECT_USER", userID, sessioncode, (res: { success: boolean, msg: string }) => {
-              console.log(res.success, res.msg)
+              console.log("response:", res.success, res.msg)
+              console.log("id storage: ", reconnectMap.get(sessioncode));
+              setUserID(userID);
             });
           }
         } else {
@@ -90,6 +97,7 @@ const SessionLobby: React.FC<SessionLobbyProps> = (props) => {
   
   return (  
     <React.Fragment>
+      {console.log(socket.id)}
       { !session &&
         <JoinUsernameForm sessionCode={sessioncode} userType={props.userType} />
       }

@@ -71,6 +71,7 @@ const JoinUsernameForm: React.FC<JoinUsernameFormProps> = (props) => {
     // Make Socket.IO call to see if room exists
     if (props.userType === "student") {
       socket.emit('JOIN_SESSION', props.sessionCode, values.username, (res: {success: boolean, msg: string, data: {userID: string}}) => {
+        console.log(res);
         if (!res.success) setError(res.msg);
         else {
           setError("")

@@ -3,7 +3,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import CAPCOMButtons from '../../../media/CAPCOMButtons.svg';
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
-import {DateTime} from "luxon";
+import {DateTime, Duration, DurationObject} from "luxon";
 import {useSessionTime} from "../../../util/useSessionTime";
 import CAPCOMTable from "./CAPCOMTable";
 
@@ -32,37 +32,67 @@ const CAPCOM: React.FC<CAPCOMProps> = (props) => {
     const [signal, setSignal] = useState<boolean>(true);
     const [losTimes, setLosTimes] = useState<string[]>(['2019-11-15T15:17:37', '2019-11-15T15:57:51', '2019-11-15T16:03:53', '2019-11-15T16:07:03', '2019-11-15T16:10:10', '2019-11-15T16:13:24', '2019-11-15T16:52:26', '2019-11-15T17:37:00']);
     const [aosTimes, setAosTimes] = useState<string[]>(['2019-11-15T15:17:52', '2019-11-15T15:59:28', '2019-11-15T16:05:46', '2019-11-15T16:09:19', '2019-11-15T16:12:07', '2019-11-15T16:14:25', '2019-11-15T17:00:00', '2019-11-15T17:44:00']);
-    const [nextLOS, setNextLOS] = useState<string>("");
-    const [nextAOS, setNextAOS] = useState<string>("");
+    const [losCountdown, setLosCountdown] = useState<Duration>(
+        DateTime.fromISO("2019-11-15T15:17:37", {zone: 'utc'})
+            .diff(DateTime.fromISO("2019-11-15T15:00:00", {zone: 'utc'}))
+    );
+    const [aosCountdown, setAosCountdown] = useState<Duration>(
+        DateTime.fromISO("2019-11-15T15:17:52", {zone: 'utc'})
+            .diff(DateTime.fromISO("2019-11-15T15:00:00", {zone: 'utc'}))
+    );
 
+    // Update array of AOS and LOS times
     useEffect(() => {
-        if (aosTimes.length > 0) {
-            let nextAOSDateTime = DateTime.fromISO(aosTimes[0], {zone: 'utc'});
-            if (sessionTime < nextAOSDateTime) {
-                let aosDiff = nextAOSDateTime.diff(sessionTime, ["hours", "minutes", "seconds"]).toObject();
-                setNextAOS(`${aosDiff.hours?.toFixed(0).padStart(2, "0")}:${aosDiff.minutes?.toFixed(0).padStart(2, "0")}:${aosDiff.seconds?.toFixed(0).padStart(2, "0")}`);
-            } else {
-                setSignal(true);
-                setAosTimes(aosTimes.filter(time => sessionTime < DateTime.fromISO(time, {zone: 'utc'})));
-            }
-        }
         if (losTimes.length > 0) {
-            let nextLOSDateTime = DateTime.fromISO(losTimes[0], {zone: 'utc'});
-            if (sessionTime < nextLOSDateTime) {
-                let losDiff = nextLOSDateTime.diff(sessionTime, ["hours", "minutes", "seconds"]).toObject();
-                setNextLOS(`${losDiff.hours?.toFixed(0).padStart(2,"0")}:${losDiff.minutes?.toFixed(0).padStart(2,"0")}:${losDiff.seconds?.toFixed(0).padStart(2,"0")}`);
-            } else {
-                setSignal(false);
+            if (sessionTime >= DateTime.fromISO(losTimes[0], {zone: 'utc'})) {
+                // If current session time is after the 'next' LOS time, pop LOS time from array
                 setLosTimes(losTimes.filter(time => sessionTime < DateTime.fromISO(time, {zone: 'utc'})));
             }
         }
-    }, [sessionTime, signal, losTimes, aosTimes])
+        if (losTimes.length > 0) {
+            if (sessionTime >= DateTime.fromISO(aosTimes[0], {zone: 'utc'})) {
+                // If current session time is after the 'next' AOS time, pop AOS time from array
+                setAosTimes(aosTimes.filter(time => sessionTime < DateTime.fromISO(time, {zone: 'utc'})));
+            }
+        }
+    }, [sessionTime, aosTimes, losTimes])
+
+    // Update AOS or LOS timer countdown difference after array is updated
+    useEffect(() => {
+        if (losTimes.length > 0) {
+            let losDiff = DateTime.fromISO(losTimes[0], {zone: 'utc'}).diff(sessionTime);
+            setLosCountdown(losDiff);
+        }
+        if (aosTimes.length > 0) {
+            let aosDiff = DateTime.fromISO(aosTimes[0], {zone: 'utc'}).diff(sessionTime);
+            setAosCountdown(aosDiff);
+        }
+    }, [sessionTime, aosTimes, losTimes])
+
+    useEffect(() => {
+        if (aosTimes.length === 0 && losTimes.length === 0) {
+            // If no AOS or LOS times remaining, set to AOS for rest of session
+            setSignal(true);
+        } else if (losTimes.length === 0) {
+            // Only AOS times remaining, meaning currently LOS
+            setSignal(false);
+        } else {
+            // Both remaining, determine AOS or LOS based on which is closer
+            if (aosCountdown.as("seconds") < losCountdown.as("seconds")) {
+                // AOS is closer meaning currently LOS
+                setSignal(false);
+            } else {
+                // LOS is closer meaning currently AOS
+                setSignal(true);
+            }
+        }
+    }, [sessionTime, aosTimes.length, losTimes.length, aosCountdown, losCountdown])
 
     return (
         <Container className={classes.container}>
             <Paper variant={"outlined"} className={classes.paper}>
                 <div style={{height: "430px"}}>
-                    <CAPCOMTable />
+                    <CAPCOMTable/>
                 </div>
                 <div style={{height: "270px"}}>
                     <svg viewBox={"0 0 1190 260"}>
@@ -108,7 +138,7 @@ const CAPCOM: React.FC<CAPCOMProps> = (props) => {
                               fontSize={14}
                               fontWeight={700}
                               textAnchor={"middle"}>
-                        CAUTION
+                            CAUTION
                         </text>
                         <rect x="477" y="158" rx="8" ry="8" width="71" height="42"
                               style={{
@@ -135,12 +165,12 @@ const CAPCOM: React.FC<CAPCOMProps> = (props) => {
                         <text x={"75.4%"} y={"65.4%"} fill={"#E7BA73"} fontSize={36}
                               textAnchor={"middle"}
                         >
-                            {nextAOS}
+                            {aosCountdown.toFormat("hh:mm:ss")}
                         </text>
                         <text x={"75.4%"} y={"90%"} fill={"#E7BA73"} fontSize={36}
                               textAnchor={"middle"}
                         >
-                            {nextLOS}
+                            {losCountdown.toFormat("hh:mm:ss")}
                         </text>
                     </svg>
                 </div>

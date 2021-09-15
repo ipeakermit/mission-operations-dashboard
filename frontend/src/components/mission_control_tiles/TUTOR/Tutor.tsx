@@ -51,10 +51,13 @@ const Tutor: React.FC<TutorProps> = (props) => {
                             { logs && logs.length > 0 &&
                                 logs.map((log, index) => (
                                         <TableRow key={index}>
-                                            <TableCell>
+                                            <TableCell style={{width: "150px"}}>
                                                 {DateTime.fromISO(log.createdAt, {zone: 'utc'}).setZone("Australia/Melbourne").toFormat("dd/MM HH:mm:ss")}
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell style={{width: "120px"}}>
+                                                {log.target_id?.console ? log.target_id.console.toUpperCase() : ""}
+                                            </TableCell>
+                                            <TableCell style={{width: "250px"}}>
                                                 {log.target_id ? log.target_id.name : ""}
                                             </TableCell>
                                             <TableCell>

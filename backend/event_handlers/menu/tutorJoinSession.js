@@ -1,6 +1,6 @@
 const assert = require("assert");
 const mongoose = require("mongoose");
-const {fetchSession, updateSessionById} = require("../../database/sessionFunctions");
+const {fetchSessionAndPopulate, updateSessionById} = require("../../database/sessionFunctions");
 const {ValidationError} = require("../../database/ValidationError");
 const User = require('../../schemas/user');
 
@@ -10,10 +10,10 @@ const handler = async (context, session_code, username) => {
 
   try {
     // Use transaction to roll back changes on error
-    db_session.startTransaction();
+    await db_session.startTransaction();
 
     // Fetch session using session code
-    let session = await fetchSession(session_code);
+    let session = await fetchSessionAndPopulate(session_code, db_session);
 
     // Throw validation error if no result returned
     assert.ok(session, new ValidationError("No session with matching session code found"));

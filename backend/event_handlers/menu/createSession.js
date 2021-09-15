@@ -13,7 +13,7 @@ const handler = async (context) => {
 
   try {
     // Use transaction to roll back changes on error
-    db_session.startTransaction();
+    await db_session.startTransaction();
 
     // Create new host user in database
     const user = await User.create([{
@@ -54,7 +54,7 @@ const handler = async (context) => {
     session = await populateSession(session[0], db_session);
 
     // Add session code to host user object room attribute
-    User.updateOne({_id: user[0]._id}, {room: session._id});
+    await User.updateOne({_id: user[0]._id}, {room: session._id}).session(db_session);
 
     // Populate OSTPV events for session
     await initEvents(session._id, db_session);
@@ -68,12 +68,14 @@ const handler = async (context) => {
     // Return session data and callback response
     console.info(`CREATE_SESSION: Session ${newSessionCode} created`);
     context.io.in(newSessionCode).emit("SESSION_DATA", session);
-    return [session, {
-      success: true, msg: "", data: {
+    return {
+      success: true,
+      msg: "",
+      data: {
         sessionCode: newSessionCode,
         userID: user[0]._id,
       },
-    }]
+    }
   } catch (err) {
     // If an error occurred, rollback and log the warning details
     await db_session.abortTransaction();

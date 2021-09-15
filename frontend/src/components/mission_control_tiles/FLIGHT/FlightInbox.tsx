@@ -50,7 +50,7 @@ const initialEFN = [{
         _id: "",
         name: "Mission Manager",
         room: "",
-        console: "",
+        console: "Mission Manager",
         disconnected: false,
     },
     subject: "Expedition 61 EVA 4 began at 6:50 EST (10:50 GMT)",
@@ -85,8 +85,8 @@ const FlightInbox: React.FC<FlightInboxProps> = (props) => {
             <Paper variant={"outlined"} className={classes.paper}>
                 <div style={{height: "700px"}}>
                     <Typography className={classes.time} variant={"h6"}>{sessionTime?.toFormat("ooo/HH:mm:ss")} GMT</Typography>
-                    <TableContainer>
-                        <Table>
+                    <TableContainer style={{maxHeight: "95%"}}>
+                        <Table size={"small"}>
                             <TableHead>
                                 <TableRow>
                                     <TableCell>EFN ID</TableCell>
@@ -103,8 +103,8 @@ const FlightInbox: React.FC<FlightInboxProps> = (props) => {
                                         <TableCell style={{width: "100px"}}>
                                             {`EFN${index.toString().padStart(3, '0')}`}
                                         </TableCell>
-                                        <TableCell style={{width: "300px"}}>
-                                            {efn.sender_id.name}
+                                        <TableCell style={{width: "200px"}}>
+                                            {efn.sender_id.console.toUpperCase()}
                                         </TableCell>
                                         <TableCell>
                                             {efn.subject}
