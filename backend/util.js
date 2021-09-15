@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const Session = require('./session');
-const Log = require("./log");
+const Session = require('./schemas/session');
+const Log = require("./schemas/log");
 const {DateTime} = require("luxon");
 
 const fetchSession = async (session_code) => {
@@ -16,17 +16,20 @@ const fetchSession = async (session_code) => {
   .catch((e) => {console.log(e)});
 }
 
-const submitLog = async (session_id, session_code, target_id, message) => {
-  await Log.create({
+const submitLog = async (session_id, target_id, db_session, message) => {
+  // Create new log based on parameters
+  await Log.create([{
                      session_id: session_id,
                      target_id: target_id,
                      message: message,
                      createdAt: DateTime.utc()
-                   }).catch((e) => {console.log(e)});
+                   }], {session: db_session});
+  // Return all logs
+  // TODO: reduce data transmission by sending only changed logs
   return await Log.find({session_id: session_id})
                   .populate({path: 'target_id', model: 'User'})
+                  .session(db_session)
                   .exec()
-                  .catch((e) => console.log(e));
 }
 
 

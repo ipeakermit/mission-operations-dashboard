@@ -83,6 +83,7 @@ const JoinSessionCodeForm: React.FC<JoinSessionCodeFormProps> = (props) => {
 
   const handleCreateSession = () => {
     socket.emit("CREATE_SESSION", (res: {success: boolean, msg: string, data: {sessionCode: string, userID: string} }) => {
+      console.log(res);
       if (!res.success) setError(res.msg);
       else {
         // Redirect user to the lobby of newly created session

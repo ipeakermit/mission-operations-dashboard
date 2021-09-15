@@ -38,7 +38,7 @@ interface JoinConsoleScreenProps {
 const JoinConsoleScreen: React.FC<JoinConsoleScreenProps> = (props) => {
   const classes = useStyles();
   const [error, setError] = useState("");
-  const { session } = useSessionContext();
+  const { session, userID } = useSessionContext();
   const [reconnectMap, addMapKey, deleteMapKey] = useLocalStorageMap("reconnectMap", new Map());
   
   const fetchConsoleNames = (consoleName: keyof Consoles) => {
@@ -56,7 +56,7 @@ const JoinConsoleScreen: React.FC<JoinConsoleScreenProps> = (props) => {
 
   const joinConsole = (console: keyof Consoles) => {
     if (session && props.userType === "student") {
-      socket.emit("JOIN_CONSOLE", console, session.session_code, reconnectMap.get(session.session_code), (res: {success: boolean, msg: string}) => {
+      socket.emit("JOIN_CONSOLE", console, session.session_code, userID, (res: {success: boolean, msg: string}) => {
         if (!res.success) {
           setError(res.msg);
         }
@@ -66,7 +66,7 @@ const JoinConsoleScreen: React.FC<JoinConsoleScreenProps> = (props) => {
 
   const leaveSession = () => {
     if (session) {
-      socket.emit("LEAVE_SESSION", reconnectMap.get(session.session_code), session.session_code, (res: { success: boolean, msg: string }) => {
+      socket.emit("LEAVE_SESSION", userID, session.session_code, (res: { success: boolean, msg: string }) => {
         if (!res.success) {
           setError(res.msg);
         } else {
