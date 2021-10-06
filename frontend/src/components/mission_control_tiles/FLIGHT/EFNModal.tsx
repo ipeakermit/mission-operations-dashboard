@@ -45,6 +45,7 @@ const EFNModal: React.FC<EFNModalProps> = (props) => {
     const handleSubmitComment = () => {
         if (session && userID && props.efn) {
             socket.emit("ADD_EFN_COMMENT", userID, props.efn._id, session._id, commentText, session.session_code);
+            setCommentText("");
         }
     }
 
@@ -59,21 +60,29 @@ const EFNModal: React.FC<EFNModalProps> = (props) => {
 
     return (
         <Dialog open={props.open} onClose={closeModal}>
-            <DialogTitle style={{ paddingBottom: "0px", textAlign: "center"}}>
-                {`${props.efn.sender_id.name.toUpperCase()}`}
-                <br/>
-                {`${props.efn.subject}`}
-            </DialogTitle>
+            <DialogContent style={{
+                paddingBottom: "0px",
+                textAlign: "center",
+            }}>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <Typography>{props.efn.sender_id.console.toUpperCase()}</Typography>
+                    <Typography>{`EFN${props.index?.toString().padStart(3, '0')}`}</Typography>
+                </div>
+                <Divider style={{margin: "10px 0"}} />
+                <Typography variant={"h5"} align={"center"} style={{ paddingBottom: "15px"}}>
+                    {props.efn.subject}
+                </Typography>
+            </DialogContent>
             <DialogContent style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 paddingTop: "0px",
                 width: "550px",
-                margin: "0 auto"
+                margin: "0 auto",
             }}>
-                <Typography variant={"subtitle2"} align={"center"} style={{ paddingBottom: "15px"}}>
-                    {`EFN${props.index?.toString().padStart(3, '0')}`}
+                <Typography variant={"body1"} align={"justify"} style={{ paddingBottom: "30px"}}>
+                    {props.efn.message}
                 </Typography>
                 <FormControl variant={"outlined"}>
                     <InputLabel id={"efn-select-label"}>Event Status</InputLabel>
@@ -93,17 +102,33 @@ const EFNModal: React.FC<EFNModalProps> = (props) => {
                         <MenuItem value={"approved"}>Approved</MenuItem>
                     </Select>
                 </FormControl>
-                <Typography variant={"body1"} align={"justify"} style={{ paddingBottom: "15px"}}>
-                    {props.efn.message}
+            </DialogContent>
+            <DialogContent style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                paddingTop: "0px",
+                width: "550px",
+                margin: "0 auto"
+            }}>
+                <Typography variant={"body1"} align={"center"} style={{width: "100%"}}>
+                    Comments
                 </Typography>
-                <Divider light style={{width: "100%", marginBottom: "20px"}}/>
+                <Divider style={{margin: "0 0 10px 0", width: "100%"}}/>
                 {
                     props.efn.comments.map((comment, index) => (
                         <React.Fragment key={index}>
-                            <Typography variant={"body2"} align={"justify"} gutterBottom >
-                                {comment}
-                            </Typography>
-                            <Divider light style={{width: "100%", marginBottom: "20px"}}/>
+                            <div style={{
+                                width: "100%",
+                                padding: "10px 15px",
+                                margin: "5px 0",
+                                borderRadius: "5px",
+                                backgroundColor: "#505050",
+                            }}>
+                                <Typography variant={"body2"} align={"justify"}>
+                                    {comment}
+                                </Typography>
+                            </div>
                         </React.Fragment>
                     ))
                 }
@@ -114,8 +139,10 @@ const EFNModal: React.FC<EFNModalProps> = (props) => {
                     variant={"outlined"}
                     rows={3}
                     multiline
+                    value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     disabled={props.efn._id === ""}
+                    style={{marginTop: "15px"}}
                 />
                 <Button
                     color={"primary"}

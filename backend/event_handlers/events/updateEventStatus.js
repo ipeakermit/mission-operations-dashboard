@@ -39,7 +39,7 @@ const handler = async (context, user_id, event_id, session_id, status, session_c
     // Fetch list of events for the current session
     let events = await Event.find({session_id: session_id}).session(db_session);
 
-    // Create a new log and fetch logs
+    // Create a new log and fetch tutor_logs
     let logs = await submitLog(session_id, user_id, db_session,
       `Updated event ${event_id} to status ${status}`,
     )

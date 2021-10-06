@@ -24,8 +24,8 @@ const submitLog = async (session_id, target_id, db_session, message) => {
                      message: message,
                      createdAt: DateTime.utc()
                    }], {session: db_session});
-  // Return all logs
-  // TODO: reduce data transmission by sending only changed logs
+  // Return all tutor_logs
+  // TODO: reduce data transmission by sending only changed tutor_logs
   return await Log.find({session_id: session_id})
                   .populate({path: 'target_id', model: 'User'})
                   .session(db_session)

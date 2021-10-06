@@ -39,7 +39,7 @@ const handler = async (context, user_id, session_code) => {
       // Fetch OSTPV events
       let events = await Event.find({session_id: session._id}).session(db_session);
 
-      // Create a new log and fetch logs
+      // Create a new log and fetch tutor_logs
       let logs = await submitLog(session._id, user_id, db_session,
         `Reconnected to session ${session_code} successfully`,
       )

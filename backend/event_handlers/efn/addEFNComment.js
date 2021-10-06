@@ -21,7 +21,7 @@ const handler = async (context, user_id, efn_id, session_id, comment, session_co
                                       .populate({path: 'sender_id', model: 'User'})
                                       .session(db_session);
 
-    // Create a new log and fetch logs
+    // Create a new log and fetch tutor_logs
     let logs = await submitLog(session_id, user_id, db_session,
       `Added a comment to EFN ${efn_id}`,
     )

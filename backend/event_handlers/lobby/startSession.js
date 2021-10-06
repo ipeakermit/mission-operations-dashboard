@@ -36,7 +36,7 @@ const handler = async (context, session_code) => {
     // Fetch OSTPV events
     let events = await Event.find({session_id: session._id}, {}, {session: db_session});
 
-    // Create a new log and fetch logs
+    // Create a new log and fetch tutor_logs
     let logs = await submitLog(session._id, null, db_session,
       `Lab session started`,
     )

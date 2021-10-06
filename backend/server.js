@@ -117,7 +117,7 @@ io.on('connection', socket => {
   })
 
   socket.on("FIRST_TAB_OPEN", async (session_id, session_code, user_id, tab_name) => {
-    await require('./event_handlers/logs/firstTabOpen.js')
+    await require('./event_handlers/tutor_logs/firstTabOpen.js')
       .handler(context, session_id, session_code, user_id, tab_name)
   })
 
