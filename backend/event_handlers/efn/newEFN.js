@@ -45,7 +45,7 @@ const handler = async (context, efn_data) => {
                                       .populate({path: 'sender_id', model: 'User'})
                                       .session(db_session);
 
-    // Create a new log and fetch logs
+    // Create a new log and fetch tutor_logs
     let logs = await submitLog(session._id, user._id, db_session,
       `Created EFN ${efn[0]._id}`,
     )

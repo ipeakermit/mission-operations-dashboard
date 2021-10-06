@@ -120,10 +120,10 @@ const CAPCOM: React.FC<CAPCOMProps> = (props) => {
                         </text>
                         <rect x="383" y="74" rx="8" ry="8" width="71" height="42"
                               style={{
-                                  fill: sessionTime > DateTime.fromISO("2019-11-15T16:02:24", {zone: 'utc'}) ? "#F54242" : "lightgray"
+                                  fill: sessionTime > DateTime.fromISO("2019-11-15T15:44:14", {zone: 'utc'}) ? "#F54242" : "lightgray"
                               }}/>
                         <text x={"35.2%"} y={"38%"}
-                              fill={sessionTime > DateTime.fromISO("2019-11-15T16:02:24", {zone: 'utc'}) ? "white" : "black"}
+                              fill={sessionTime > DateTime.fromISO("2019-11-15T15:44:14", {zone: 'utc'}) ? "white" : "black"}
                               fontSize={14}
                               fontWeight={700}
                               textAnchor={"middle"}>

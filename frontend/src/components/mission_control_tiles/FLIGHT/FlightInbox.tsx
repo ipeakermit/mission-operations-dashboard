@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {Avatar, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import {useSessionContext} from '../../../context/SessionContext'
 import Typography from "@material-ui/core/Typography";
 import {EFN} from '../../../types/efn'
@@ -94,6 +94,7 @@ const FlightInbox: React.FC<FlightInboxProps> = (props) => {
                                     <TableCell>Subject</TableCell>
                                     <TableCell>Status</TableCell>
                                     <TableCell>Time</TableCell>
+                                    <TableCell align={"center"}>Comments</TableCell>
                                     <TableCell align={"center"}>View Content</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -114,6 +115,16 @@ const FlightInbox: React.FC<FlightInboxProps> = (props) => {
                                         </TableCell>
                                         <TableCell style={{width: "150px"}}>
                                             {DateTime.fromMillis(parseInt(efn.createdAt), { zone: 'utc'}).toFormat("ooo/HH:mm:ss")}
+                                        </TableCell>
+                                        <TableCell style={{width: "70px"}} align={"center"}>
+                                            <Avatar style={{
+                                                height: "24px",
+                                                width: "24px",
+                                                margin: "0 auto",
+                                                backgroundColor: "#5FB5F6"
+                                            }}>
+                                                {efn.comments.length}
+                                            </Avatar>
                                         </TableCell>
                                         <TableCell className={classes.btnCell}>
                                             <Button
