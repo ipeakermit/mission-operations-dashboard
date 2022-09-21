@@ -1,0 +1,6 @@
+./build-docker
+NAME=missioncontrol_front
+docker rm -f $NAME
+#docker run --name $NAME -it -p 3000:3000 mission-operations-dashboard-frontend bash
+docker run --name $NAME -d -p 3000:3000 mission-operations-dashboard-frontend npm start
+docker logs -f $NAME

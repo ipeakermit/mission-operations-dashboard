@@ -1,0 +1,3 @@
+docker pull mongo
+#docker run -it --network some-network --rm mongo mongosh --host some-mongo test
+docker run -it --network missioncontrol_network --rm mongo mongosh --host missioncontrol_db --eval 'rs.initiate()'

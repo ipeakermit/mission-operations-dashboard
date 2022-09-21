@@ -102,3 +102,5 @@ Updating the code running on the server is simple:
 3. Checkout into the correct branch and pull changes: `sudo git checkout release` and `sudo git pull`
 4. Build the React frontend using `sudo npm run build` from the `/var/www/example.com/client` directory.
 5. Start the server again using `pm2 start server.js --time` from the `/var/www/example.com/server` directory.
+
+# MongoDB database - persistent storage for some server data

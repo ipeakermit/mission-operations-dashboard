@@ -59,9 +59,9 @@ const Chart: React.FC<ChartProps> = (props) => {
                 animation: {
                     duration: 0
                 },
-                title: {
-                    display: false
-                },
+                //title: {
+                //    display: false
+                //},
                 plugins: {
                     legend: {
                         display: false

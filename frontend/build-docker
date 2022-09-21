@@ -1,0 +1,1 @@
+docker build -t mission-operations-dashboard-frontend .

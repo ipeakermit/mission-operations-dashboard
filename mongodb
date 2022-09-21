@@ -1,0 +1,11 @@
+docker pull mongo
+NAME=missioncontrol_db
+
+docker rm -f $NAME
+docker network create missioncontrol_network
+
+#docker run --name $NAME -e MONGO_INITDB_DATABASE=missioncontrol -e MONGO_INITDB_ROOT_USERNAME=ianpeake -e MONGO_INITDB_ROOT_PASSWORD=19F4tvgc -it -p 27017:27017 mongo --replSet rs0
+
+docker run --name $NAME --network missioncontrol_network -e MONGO_INITDB_DATABASE=missioncontrol -d -p 27017:27017 mongo mongod --replSet missioncontrol_replset
+sleep 5
+docker run -d --network missioncontrol_network --rm mongo mongosh --host missioncontrol_db --eval 'rs.initiate()'

@@ -4,7 +4,14 @@ const {fetchSessionAndPopulate, updateSessionById} = require("../../database/ses
 const {ValidationError} = require("../../database/ValidationError");
 const User = require('../../schemas/user');
 
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const handler = async (context, session_code, username) => {
+  // delay to help deal with sage2 frontend issue --- needed?
+  //await timeout(Math.random()*1000);
+
   // Create mongoose session to handle transaction
   const db_session = await mongoose.connection.startSession();
 
@@ -58,4 +65,15 @@ const handler = async (context, session_code, username) => {
   }
 }
 
-module.exports.handler = handler;
+const robustHandler = async (context, session_code, username) => {
+  result = {success: false, msg: "awaiting"};
+  while (!result.success) {
+      result = await handler(context,session_code,username);
+      console.info(`JOIN_SESSION: robust handler ${result}`,result);
+  }
+  return result;
+}
+
+
+//module.exports.handler = handler;
+module.exports.handler = robustHandler;
