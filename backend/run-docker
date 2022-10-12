@@ -2,5 +2,5 @@
 NAME=missioncontrol_backend
 docker rm -f $NAME
 #docker run --name $NAME -it -p 4001:4001 mission-operations-dashboard bash
-docker run --name $NAME -d -p 4001:4001 mission-operations-dashboard npm start
+docker run --name $NAME -d -p 4001:4001 --restart unless-stopped mission-operations-dashboard npm start
 docker logs -f $NAME
